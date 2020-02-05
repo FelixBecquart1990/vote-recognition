@@ -1,8 +1,3 @@
----
-title: Felix's Final Project
-tags: CoderSchool, Mariana, Final project
----
-
 ![](https://i.imgur.com/evxrtfs.png)
 
 # Interactive Crowd Voting Recognition
