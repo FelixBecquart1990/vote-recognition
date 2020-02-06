@@ -7,19 +7,19 @@
     </v-app-bar>
 
     <v-content>
-      <BarChart />
+      <Home />
     </v-content>
   </v-app>
 </template>
 
 <script>
-import BarChart from "./components/BarChart";
+import Home from "./views/Home";
 
 export default {
   name: "App",
 
   components: {
-    BarChart
+    Home
   },
 
   data: () => ({

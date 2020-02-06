@@ -1,14 +1,10 @@
 <template>
   <div class="small mt-5 pt-5">
-    <reactive-bar-chart
-      :chart-data="chartData"
-      :options="options"
-    ></reactive-bar-chart>
-    <div class="d-flex justify-center mt-5">
+    <reactive-bar-chart :chart-data="chartData" :options="options"></reactive-bar-chart>
+    <!-- <div class="d-flex justify-center mt-5">
       <v-btn @click="getDataFromAPI()" depressed rounded :loading="loading"
-        >Test API</v-btn
-      >
-    </div>
+        >Test API</v-btn>
+    </div>-->
   </div>
 </template>
 
@@ -16,13 +12,14 @@
 import ReactiveBarChart from "./ReactiveBarChart.js";
 export default {
   name: "App",
+  props: ["result"],
   components: {
     ReactiveBarChart
   },
   data() {
     return {
       loading: false,
-      chartData: {},
+      // chartData: {},
       votes: [],
       options: {
         legend: {
@@ -55,32 +52,46 @@ export default {
       }
     };
   },
+  computed: {
+    chartData() {
+      return {
+        labels: ["Yes: " + this.result[0], "No: " + this.result[1]],
+        datasets: [
+          {
+            label: "Data One",
+            backgroundColor: "#2196F3",
+            data: this.result
+          }
+        ]
+      };
+    }
+  },
   methods: {
-    getDataFromAPI() {
-      this.loading = true;
-      let self = this;
-      fetch("http://127.0.0.1:5000/")
-        .then(function(response) {
-          return response.json();
-        })
-        .then(function(data) {
-          self.chartData = {
-            labels: ["Yes " + data[0], "No " + data[1]],
-            datasets: [
-              {
-                label: "Data One",
-                backgroundColor: "#2196F3",
-                data: data
-              }
-            ]
-          };
-          self.loading = false;
-        })
-        .catch(function(err) {
-          self.loading = false;
-          console.log(err);
-        });
-    },
+    // getDataFromAPI() {
+    //   this.loading = true;
+    //   let self = this;
+    //   fetch("http://127.0.0.1:5000/")
+    //     .then(function(response) {
+    //       return response.json();
+    //     })
+    //     .then(function(data) {
+    //       self.chartData = {
+    //         labels: ["Yes " + data[0], "No " + data[1]],
+    //         datasets: [
+    //           {
+    //             label: "Data One",
+    //             backgroundColor: "#2196F3",
+    //             data: data
+    //           }
+    //         ]
+    //       };
+    //       self.loading = false;
+    //     })
+    //     .catch(function(err) {
+    //       self.loading = false;
+    //       console.log(err);
+    //     });
+    // },
     generateData() {
       this.votes = [];
       for (let i = 0; i < 2; i++) {
@@ -101,8 +112,8 @@ export default {
     }
   },
   mounted() {
-    this.generateData();
-    setInterval(this.generateData, 5000);
+    // this.generateData();
+    // setInterval(this.generateData, 5000);
   }
   // async mounted() {
   //   this.loaded = false;

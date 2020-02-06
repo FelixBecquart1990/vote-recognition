@@ -7,6 +7,9 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@tensorflow-models/posenet": "^2.2.1",
+    "@tensorflow/tfjs-converter": "^1.5.2",
+    "@tensorflow/tfjs-core": "^1.5.2",
     "chart.js": "^2.9.3",
     "core-js": "^3.4.4",
     "vue": "^2.6.10",
