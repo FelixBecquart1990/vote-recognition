@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="primary" dark short v-if="$route.name != 'video'">
       <v-btn
         v-if="$route.name != 'home'"
         fab
@@ -39,3 +39,9 @@ export default {
   })
 };
 </script>
+
+<style>
+body::-webkit-scrollbar {
+  display: none;
+}
+</style>
