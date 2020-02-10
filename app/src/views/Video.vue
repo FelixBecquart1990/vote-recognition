@@ -26,6 +26,10 @@
       >{{start?'mdi-stop':'mdi-play'}}</v-icon>
     </v-btn>
 
+    <div style="position:fixed;z-index:1;top:4vh;width:100%">
+      <textarea v-model="question" placeholder="Write your question here..." v-html="question"></textarea>
+    </div>
+
     <div class="d-flex justify-center">
       <video ref="video" id="video" width="640" height="480" autoplay></video>
     </div>
@@ -34,7 +38,7 @@
     </div>-->
     <div class="chart-labels">
       <div class="chart">
-        <div class="yes" :style="{height:result[0]*50+'px', tran}">{{ result[0]!=0?result[0]:" " }}</div>
+        <div class="yes" :style="{height:result[0]*50+'px'}">{{ result[0]!=0?result[0]:" " }}</div>
         <div class="no" :style="{height:result[1]*50+'px'}">{{ result[1]!=0?result[1]:" " }}</div>
       </div>
       <div class="labels">
@@ -42,13 +46,6 @@
         <div class="no-label">No</div>
       </div>
     </div>
-    <!-- <div class="d-flex justify-center mt-5">
-      <BarChart
-        style="width:100px; height:100px"
-        msg="Welcome to Your Vue.js App"
-        :result="result"
-      />
-    </div>-->
     <canvas v-show="false" ref="canvas" id="canvas" width="640" height="480"></canvas>
     <img :src="capture" id="image" style="height:100vh;width:100vw" v-show="false" />
   </div>
@@ -56,25 +53,20 @@
 
 
 <script>
-// @ is an alias to /src
-import BarChart from "@/components/BarChart.vue";
-
 import * as posenet from "@tensorflow-models/posenet";
 
 export default {
   name: "video-recognition",
-  components: {
-    BarChart
-  },
   data() {
     return {
-      result: [2, 1],
+      result: [0, 0],
       video: {},
       canvas: {},
       capture: null,
       start: false,
       loading: false,
-      interval: null
+      interval: null,
+      question: ""
     };
   },
   methods: {
@@ -83,16 +75,13 @@ export default {
         this.loading = true;
         this.start = true;
         this.predict();
-        let self = this;
-        this.interval = setInterval(self.predict(), 2000);
       } else {
         this.start = false;
-        clearInterval(this.interval);
       }
     },
     predict() {
       if (!this.start) return;
-      this.estimateMultiplePosesOnImage(document.getElementById("image"));
+      this.estimateMultiplePosesOnImage();
     },
     takePicture() {
       this.canvas = this.$refs.canvas;
@@ -102,27 +91,32 @@ export default {
       this.capture = this.canvas.toDataURL("image/png");
     },
     // multi-pose
-    async estimateMultiplePosesOnImage(imageElement) {
-      // let self = this
-      // let timeoutRunning = true
-      // let timeout = setTimeout(self.predict(), 1000);
-
-      const net = await posenet.load();
-
+    async estimateMultiplePosesOnImage() {
+      var t0 = performance.now();
       this.takePicture();
-
-      // estimate poses
-      const poses = await net.estimateMultiplePoses(imageElement, {
-        flipHorizontal: false,
-        maxDetections: 20,
-        scoreThreshold: 0.6,
-        nmsRadius: 2
-      });
-      if (!this.start) return;
-      this.numberOfVotes(poses);
-      this.loading = false;
-      // next estimation
-      this.predict();
+      let imageElement = document.getElementById("image");
+      if (imageElement.src != "") {
+        const net = await posenet.load();
+        // estimate poses
+        const poses = await net.estimateMultiplePoses(imageElement, {
+          flipHorizontal: false,
+          maxDetections: 20,
+          scoreThreshold: 0.6,
+          nmsRadius: 2
+        });
+        if (!this.start) return;
+        this.numberOfVotes(poses);
+        this.loading = false;
+      }
+      var t1 = performance.now();
+      if (t1 - t0 > 2000) {
+        this.estimateMultiplePosesOnImage();
+      } else {
+        let self = this;
+        setTimeout(function() {
+          self.estimateMultiplePosesOnImage();
+        }, 2000);
+      }
     },
     // calculate number of votes
     numberOfVotes(poses) {
@@ -207,5 +201,24 @@ export default {
   color: white;
   font-size: 30px;
   text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+textarea {
+  border: none;
+  overflow: auto;
+  outline: none;
+  box-shadow: none;
+
+  resize: none; /*remove the resize handle on the bottom right*/
+  color: white;
+  text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
+  font-size: 40px;
+  text-align: center;
+  width: 90%;
+  height: 300px;
+  margin: auto 5vw;
+}
+textarea::placeholder {
+  color: white;
 }
 </style>

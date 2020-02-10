@@ -44,4 +44,14 @@ export default {
 body::-webkit-scrollbar {
   display: none;
 }
+
+* {
+  font-family: mainFont;
+  /*color:#7B8790*/
+}
+
+@font-face {
+  font-family: mainFont;
+  src: url("./assets/gothamrnd-medium.ttf");
+}
 </style>
