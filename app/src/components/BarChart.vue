@@ -1,5 +1,5 @@
 <template>
-  <div class="small mt-5 pt-5">
+  <div>
     <reactive-bar-chart :chart-data="chartData" :options="options"></reactive-bar-chart>
     <!-- <div class="d-flex justify-center mt-5">
       <v-btn @click="getDataFromAPI()" depressed rounded :loading="loading"
@@ -132,8 +132,8 @@ export default {
 </script>
 
 <style>
-.small {
-  max-width: 300px;
+/* .small {
+  max-width: 100px;
   margin: 0px auto;
-}
+} */
 </style>

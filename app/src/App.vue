@@ -1,13 +1,25 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark
-      ><v-spacer></v-spacer><v-toolbar-title>Yes/No</v-toolbar-title>
+    <v-app-bar app color="primary" dark>
+      <v-btn
+        v-if="$route.name != 'home'"
+        fab
+        depressed
+        color="primary"
+        to="/"
+        small
+        style="margin-right:-40px"
+      >
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-toolbar-title>Yes/No</v-toolbar-title>
 
       <v-spacer></v-spacer>
     </v-app-bar>
 
     <v-content>
-      <Home />
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
