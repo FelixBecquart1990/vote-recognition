@@ -13,6 +13,7 @@
     "@tensorflow/tfjs-core": "^1.5.2",
     "chart.js": "^2.9.3",
     "core-js": "^3.4.4",
+    "firebase": "^7.8.1",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.5.0",
     "vue-router": "^3.1.3",

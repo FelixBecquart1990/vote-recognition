@@ -6,14 +6,11 @@
     <div class="d-flex justify-center mt-5">
       <img id="cat" src="../assets/logo.jpg" />
     </div>
-    <BarChart msg="Welcome to Your Vue.js App" :result="result" />
   </div>
 </template>
 
-
 <script>
 // @ is an alias to /src
-import BarChart from "@/components/BarChart.vue";
 
 import * as posenet from "@tensorflow-models/posenet";
 

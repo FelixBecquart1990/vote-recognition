@@ -1,14 +1,18 @@
 <template>
   <div class="video-recognition">
+    <NavigationDrawer />
     <v-btn
       fab
       depressed
       color="transparent"
       to="/"
       small
+      dark
       style="position:fixed;z-index:2;left:5px;top:5px"
     >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-arrow-left</v-icon>
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
+        >mdi-arrow-left</v-icon
+      >
     </v-btn>
     <v-btn
       fab
@@ -16,18 +20,52 @@
       color="transparent"
       small
       dark
-      style="position:fixed;z-index:2;left:35px;top:5px"
+      style="position:fixed;z-index:2;left:50px;top:5px"
       @click="toggle()"
-      :loading="loading"
+      :loading="loadingModel"
     >
       <v-icon
         color="white"
         style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-      >{{start?'mdi-stop':'mdi-play'}}</v-icon>
+        >{{ start ? "mdi-stop" : "mdi-play" }}</v-icon
+      >
     </v-btn>
 
-    <div style="position:fixed;z-index:1;top:4vh;width:100%">
-      <textarea v-model="question" placeholder="Write your question here..." v-html="question"></textarea>
+    <v-btn
+      fab
+      depressed
+      color="transparent"
+      small
+      dark
+      style="position:fixed;z-index:2;left:95px;top:5px"
+      @click="save()"
+      :loading="loadingSaveResult"
+    >
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
+        >mdi-content-save</v-icon
+      >
+    </v-btn>
+
+    <v-btn
+      fab
+      depressed
+      color="transparent"
+      small
+      dark
+      style="position:fixed;z-index:2;left:140px;top:5px"
+      @click="showSavedResults()"
+    >
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
+        >mdi-poll-box</v-icon
+      >
+    </v-btn>
+
+    <div style="position:fixed;z-index:1;top:8vh;width:100%">
+      <textarea
+        v-model="question"
+        placeholder="Write your question here..."
+        v-html="question"
+      ></textarea>
     </div>
 
     <div class="d-flex justify-center">
@@ -36,27 +74,49 @@
     <!-- <div class="d-flex justify-center" style="margin-top:-50px;">
       <v-btn depressed rounded @click="toggle()" :loading="loading">{{start?'Stop':'Start'}}</v-btn>
     </div>-->
-    <div class="chart-labels">
+    <!-- <div class="chart-labels">
       <div class="chart">
-        <div class="yes" :style="{height:result[0]*50+'px'}">{{ result[0]!=0?result[0]:" " }}</div>
-        <div class="no" :style="{height:result[1]*50+'px'}">{{ result[1]!=0?result[1]:" " }}</div>
+        <div class="yes" :style="{ height: result[0] * 50 + 'px' }">
+          {{ result[0] != 0 ? result[0] : " " }}
+        </div>
+        <div class="no" :style="{ height: result[1] * 50 + 'px' }">
+          {{ result[1] != 0 ? result[1] : " " }}
+        </div>
       </div>
       <div class="labels">
         <div class="yes-label">Yes</div>
         <div class="no-label">No</div>
       </div>
-    </div>
-    <canvas v-show="false" ref="canvas" id="canvas" width="640" height="480"></canvas>
-    <img :src="capture" id="image" style="height:100vh;width:100vw" v-show="false" />
+    </div> -->
+    <canvas
+      v-show="false"
+      ref="canvas"
+      id="canvas"
+      width="640"
+      height="480"
+    ></canvas>
+    <img
+      :src="capture"
+      id="image"
+      style="height:100vh;width:100vw"
+      v-show="false"
+    />
+    <Chart :result="result" class="chart-fixed" />
   </div>
 </template>
 
-
 <script>
 import * as posenet from "@tensorflow-models/posenet";
+const fb = require("../firebaseConfig.js");
+import NavigationDrawer from "../components/NavigationDrawer";
+import Chart from "../components/Chart";
 
 export default {
   name: "video-recognition",
+  components: {
+    NavigationDrawer,
+    Chart
+  },
   data() {
     return {
       result: [0, 0],
@@ -64,15 +124,49 @@ export default {
       canvas: {},
       capture: null,
       start: false,
-      loading: false,
+      loadingModel: false,
+      loadingSaveResult: false,
       interval: null,
       question: ""
     };
   },
   methods: {
+    showSavedResults() {
+      this.$store.commit("setNavigationDrawer", true);
+    },
+    save() {
+      if (this.question == "") {
+        this.$store.commit("setSnackbar", {
+          color: "info",
+          timeout: 3000,
+          text: "Write a question before to save..."
+        });
+        return;
+      }
+      this.loadingSaveResult = true;
+
+      fb.graphsCollection
+        .add({
+          result: this.result,
+          createdOn: new Date(),
+          question: this.question
+        })
+        .then(payload => {
+          this.loadingSaveResult = false;
+          this.$store.commit("setSnackbar", {
+            color: "success",
+            timeout: 3000,
+            text: "Result have been saved"
+          });
+        })
+        .catch(err => {
+          this.loadingSaveResult = false;
+          console.log(err);
+        });
+    },
     toggle() {
       if (this.start == false) {
-        this.loading = true;
+        this.loadingModel = true;
         this.start = true;
         this.predict();
       } else {
@@ -106,7 +200,7 @@ export default {
         });
         if (!this.start) return;
         this.numberOfVotes(poses);
-        this.loading = false;
+        this.loadingModel = false;
       }
       var t1 = performance.now();
       if (t1 - t0 > 2000) {
@@ -115,7 +209,7 @@ export default {
         let self = this;
         setTimeout(function() {
           self.estimateMultiplePosesOnImage();
-        }, 2000);
+        }, 2000 - (t1 - t0));
       }
     },
     // calculate number of votes
@@ -161,16 +255,12 @@ export default {
   transform: scaleX(-1);
   object-fit: cover;
 }
-.chart-labels {
+.chart-fixed {
   position: fixed;
   right: 6vw;
   bottom: 2vh;
 }
-.chart {
-  /* position: fixed;
-  right: 10vw;
-  bottom: calc(10vh + 60px); */
-}
+/*
 .chart > * {
   transition: height 1s;
   vertical-align: bottom;
@@ -201,7 +291,7 @@ export default {
   color: white;
   font-size: 30px;
   text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
-}
+} */
 
 textarea {
   border: none;
