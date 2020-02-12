@@ -14,6 +14,7 @@
       dark
       @click="navigationDrawer = false"
       class="ma-1"
+      style="position:fixed;z-index:2;left:5px;top:5px"
     >
       <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
         >mdi-arrow-left</v-icon

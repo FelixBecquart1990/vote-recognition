@@ -53,7 +53,7 @@
       small
       dark
       style="position:fixed;z-index:2;left:140px;top:5px"
-      @click="showSavedResults()"
+      @click="opentNavigationDrawer()"
     >
       <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
         >mdi-poll-box</v-icon
@@ -120,12 +120,13 @@ export default {
   },
   data() {
     return {
+      frequency: 500,
       result: [0, 0],
       video: {},
       canvas: {},
       capture: null,
       start: false,
-      loadingModel: false,
+      loadingModel: true,
       loadingSaveResult: false,
       interval: null,
       question: "",
@@ -134,10 +135,11 @@ export default {
     };
   },
   methods: {
-    showSavedResults() {
+    opentNavigationDrawer() {
       this.$store.commit("setNavigationDrawer", true);
     },
     save() {
+      if (this.loadingSaveResult == true) return;
       if (this.question == "") {
         this.$store.commit("setSnackbar", {
           color: "info",
@@ -147,6 +149,7 @@ export default {
         return;
       }
       this.loadingSaveResult = true;
+      let self = this;
 
       fb.graphsCollection
         .add({
@@ -155,7 +158,9 @@ export default {
           question: this.question
         })
         .then(payload => {
-          this.loadingSaveResult = false;
+          setTimeout(function() {
+            self.loadingSaveResult = false;
+          }, 3000);
           this.$store.commit("setSnackbar", {
             color: "success",
             timeout: 3000,
@@ -169,7 +174,6 @@ export default {
     },
     toggle() {
       if (this.start == false) {
-        this.loadingModel = true;
         this.start = true;
         this.predict();
       } else {
@@ -178,9 +182,9 @@ export default {
     },
     predict() {
       this.$store.commit("setSnackbar", {
-        color: "info",
+        color: "success",
         timeout: 3000,
-        text: "Wait few seconds..."
+        text: "Now raise your hand!"
       });
       // debugger;
       this.estimateMultiplePosesOnImage();
@@ -207,54 +211,88 @@ export default {
           nmsRadius: 2
         });
         if (!this.start) return;
-        this.numberOfVotes(poses);
-        this.loadingModel = false;
-        if (!this.modelLoaded) {
-          this.$store.commit("setSnackbar", {
-            color: "success",
-            timeout: 3000,
-            text: "The model is now running"
-          });
-        }
-        this.modelLoaded = true;
+        this.analyzePoses(poses);
       }
       var t1 = performance.now();
       // console.log(t1 - t0);
-      if (t1 - t0 > 1000) {
+      // this.estimateMultiplePosesOnImage();
+
+      if (t1 - t0 > this.frequency) {
         this.estimateMultiplePosesOnImage();
       } else {
         let self = this;
         setTimeout(function() {
           self.estimateMultiplePosesOnImage();
-        }, 1000 - (t1 - t0));
+        }, this.frequency - (t1 - t0));
       }
     },
     // calculate number of votes
-    numberOfVotes(poses) {
+    analyzePoses(poses) {
       // console.log(poses);
       let vote_yes = 0;
       let vote_no = 0;
       var i = 0;
       while (poses[i]) {
         if (poses[i].score > 0.2) {
-          if (
-            poses[i].keypoints[5].position.y >
-              poses[i].keypoints[9].position.y ||
-            poses[i].keypoints[6].position.y > poses[i].keypoints[10].position.y
-          ) {
-            vote_yes++;
-          } else {
-            vote_no++;
-          }
+          this.isVotingYes(poses[i]) ? vote_yes++ : vote_no++;
+          this.isSaving(poses[i]) ? this.save() : null;
+          this.isTogglingNavigationDrawer(poses[i]);
         }
         i++;
       }
       this.result = [vote_yes, vote_no];
-      console.log(this.result);
+      // console.log(this.result);
+    },
+    isVotingYes(pose) {
+      return (
+        pose.keypoints[5].position.y > pose.keypoints[9].position.y ||
+        pose.keypoints[6].position.y > pose.keypoints[10].position.y
+      );
+    },
+    isSaving(pose) {
+      if (this.loadingSaveResult) return;
+      return (
+        pose.keypoints[7].position.y < pose.keypoints[5].position.y &&
+        pose.keypoints[8].position.y < pose.keypoints[6].position.y
+        // pose.keypoints[6].position.y > pose.keypoints[8].position.y &&
+        // pose.keypoints[8].position.y > pose.keypoints[10].position.y &&
+        // pose.keypoints[7].position.y > pose.keypoints[9].position.y &&
+        // pose.keypoints[7].position.y > pose.keypoints[5].position.y &&
+        // pose.keypoints[9].position.x > pose.keypoints[5].position.x &&
+        // pose.keypoints[10].position.x > pose.keypoints[6].position.x &&
+        // pose.keypoints[8].position.x > pose.keypoints[6].position.x
+      );
+    },
+    isTogglingNavigationDrawer(pose) {
+      if (
+        pose.keypoints[9].position.x < pose.keypoints[6].position.x &&
+        pose.keypoints[10].position.x < pose.keypoints[6].position.x
+      ) {
+        // console.log("open");
+        this.$store.commit("setNavigationDrawer", true);
+      }
+      if (
+        pose.keypoints[9].position.x > pose.keypoints[5].position.x &&
+        pose.keypoints[10].position.x > pose.keypoints[5].position.x
+      ) {
+        // console.log("open");
+        this.$store.commit("setNavigationDrawer", false);
+      }
     }
   },
   async beforeMount() {
+    this.$store.commit("setSnackbar", {
+      color: "info",
+      timeout: 3000,
+      text: "Wait few seconds..."
+    });
     this.net = await posenet.load();
+    this.$store.commit("setSnackbar", {
+      color: "success",
+      timeout: 3000,
+      text: "Ready to run!"
+    });
+    this.loadingModel = false;
   },
   mounted() {
     this.video = this.$refs.video;
