@@ -7,10 +7,7 @@ export default new Vuex.Store({
   state: {
     snackbar: { active: false, color: "", mode: "", timeout: 0, text: "" },
     navigationDrawer: false,
-    results: [
-      { result: [1, 2], createdOn: "12/10/2010", question: "Is it working?" },
-      { result: [3, 2], createdOn: "12/11/2010", question: "Really?" }
-    ]
+    results: []
   },
   mutations: {
     setSnackbar(state, val) {

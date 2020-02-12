@@ -129,7 +129,8 @@ export default {
       loadingSaveResult: false,
       interval: null,
       question: "",
-      modelLoaded: false
+      modelLoaded: false,
+      net: null
     };
   },
   methods: {
@@ -141,7 +142,7 @@ export default {
         this.$store.commit("setSnackbar", {
           color: "info",
           timeout: 3000,
-          text: "Write a question before to save..."
+          text: "Write a question before saving..."
         });
         return;
       }
@@ -181,6 +182,7 @@ export default {
         timeout: 3000,
         text: "Wait few seconds..."
       });
+      // debugger;
       this.estimateMultiplePosesOnImage();
     },
     takePicture() {
@@ -196,9 +198,9 @@ export default {
       this.takePicture();
       let imageElement = this.$refs.image;
       if (imageElement.src != "") {
-        const net = await posenet.load();
+        // const net = await posenet.load();
         // estimate poses
-        const poses = await net.estimateMultiplePoses(imageElement, {
+        const poses = await this.net.estimateMultiplePoses(imageElement, {
           flipHorizontal: false,
           maxDetections: 20,
           scoreThreshold: 0.6,
@@ -217,17 +219,19 @@ export default {
         this.modelLoaded = true;
       }
       var t1 = performance.now();
-      if (t1 - t0 > 2000) {
+      // console.log(t1 - t0);
+      if (t1 - t0 > 1000) {
         this.estimateMultiplePosesOnImage();
       } else {
         let self = this;
         setTimeout(function() {
           self.estimateMultiplePosesOnImage();
-        }, 2000 - (t1 - t0));
+        }, 1000 - (t1 - t0));
       }
     },
     // calculate number of votes
     numberOfVotes(poses) {
+      // console.log(poses);
       let vote_yes = 0;
       let vote_no = 0;
       var i = 0;
@@ -248,6 +252,9 @@ export default {
       this.result = [vote_yes, vote_no];
       console.log(this.result);
     }
+  },
+  async beforeMount() {
+    this.net = await posenet.load();
   },
   mounted() {
     this.video = this.$refs.video;
