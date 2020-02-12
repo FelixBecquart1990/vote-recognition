@@ -5,30 +5,29 @@
       fab
       depressed
       color="transparent"
-      to="/"
       small
       dark
       style="position:fixed;z-index:2;left:5px;top:5px"
-    >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-        >mdi-arrow-left</v-icon
-      >
-    </v-btn>
-    <v-btn
-      fab
-      depressed
-      color="transparent"
-      small
-      dark
-      style="position:fixed;z-index:2;left:50px;top:5px"
       @click="toggle()"
       :loading="loadingModel"
     >
       <v-icon
         color="white"
         style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-        >{{ start ? "mdi-stop" : "mdi-play" }}</v-icon
-      >
+      >{{ start ? "mdi-stop" : "mdi-play" }}</v-icon>
+    </v-btn>
+
+    <v-btn
+      fab
+      depressed
+      color="transparent"
+      small
+      dark
+      style="position:fixed;z-index:2;left:45px;top:5px"
+      @click="save()"
+      :loading="loadingSaveResult"
+    >
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-content-save</v-icon>
     </v-btn>
 
     <v-btn
@@ -38,70 +37,21 @@
       small
       dark
       style="position:fixed;z-index:2;left:95px;top:5px"
-      @click="save()"
-      :loading="loadingSaveResult"
-    >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-        >mdi-content-save</v-icon
-      >
-    </v-btn>
-
-    <v-btn
-      fab
-      depressed
-      color="transparent"
-      small
-      dark
-      style="position:fixed;z-index:2;left:140px;top:5px"
       @click="opentNavigationDrawer()"
     >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-        >mdi-poll-box</v-icon
-      >
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-poll-box</v-icon>
     </v-btn>
 
     <div style="position:fixed;z-index:1;top:8vh;width:100%">
-      <textarea
-        v-model="question"
-        placeholder="Write your question here..."
-        v-html="question"
-      ></textarea>
+      <textarea v-model="question" placeholder="Write your question here..." v-html="question"></textarea>
     </div>
 
     <div class="d-flex justify-center">
       <video ref="video" id="video" width="640" height="480" autoplay></video>
     </div>
-    <!-- <div class="d-flex justify-center" style="margin-top:-50px;">
-      <v-btn depressed rounded @click="toggle()" :loading="loading">{{start?'Stop':'Start'}}</v-btn>
-    </div>-->
-    <!-- <div class="chart-labels">
-      <div class="chart">
-        <div class="yes" :style="{ height: result[0] * 50 + 'px' }">
-          {{ result[0] != 0 ? result[0] : " " }}
-        </div>
-        <div class="no" :style="{ height: result[1] * 50 + 'px' }">
-          {{ result[1] != 0 ? result[1] : " " }}
-        </div>
-      </div>
-      <div class="labels">
-        <div class="yes-label">Yes</div>
-        <div class="no-label">No</div>
-      </div>
-    </div> -->
-    <canvas
-      v-show="false"
-      ref="canvas"
-      id="canvas"
-      width="640"
-      height="480"
-    ></canvas>
-    <img
-      :src="capture"
-      id="image"
-      ref="image"
-      style="height:100vh;width:100vw"
-      v-show="false"
-    />
+
+    <canvas v-show="false" ref="canvas" id="canvas" width="640" height="480"></canvas>
+    <img :src="capture" id="image" ref="image" style="height:100vh;width:100vw" v-show="false" />
     <Chart :result="result" class="chart-fixed" />
   </div>
 </template>
@@ -352,7 +302,7 @@ export default {
   text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
 } */
 
-textarea {
+div textarea {
   border: none;
   overflow: auto;
   outline: none;

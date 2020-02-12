@@ -1,11 +1,5 @@
 <template>
-  <v-navigation-drawer
-    v-model="navigationDrawer"
-    absolute
-    temporary
-    dark
-    class="drawer"
-  >
+  <v-navigation-drawer v-model="navigationDrawer" absolute temporary dark class="drawer">
     <v-btn
       fab
       depressed
@@ -16,18 +10,14 @@
       class="ma-1"
       style="position:fixed;z-index:2;left:5px;top:5px"
     >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-        >mdi-arrow-left</v-icon
-      >
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-arrow-left</v-icon>
     </v-btn>
     <div v-for="(result, index) in results" :key="index">
-      <div class="d-flex justify-center">
+      <div class="d-flex justify-center mt-4">
         <Chart :result="result.result" />
       </div>
       <div class="d-flex justify-center mt-3 mx-5">
-        <h2 style="color:white;font-size:30px;text-align:center">
-          {{ result.question }}
-        </h2>
+        <h2 style="color:white;font-size:30px;text-align:center">{{ result.question }}</h2>
       </div>
       <div class="d-flex justify-center mt-3 mx-5">
         <v-btn
@@ -39,11 +29,7 @@
           @click="deleteResult(result)"
           class="ma-1"
         >
-          <v-icon
-            color="red"
-            style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-            >mdi-delete</v-icon
-          >
+          <v-icon color="red" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-delete</v-icon>
         </v-btn>
       </div>
 
@@ -93,11 +79,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .drawer {
   background-color: rgba(0, 0, 0, 0.6);
 }
 .v-navigation-drawer {
   width: 100vw !important;
+}
+aside .v-navigation-drawer__content::-webkit-scrollbar {
+  display: none !important;
 }
 </style>
