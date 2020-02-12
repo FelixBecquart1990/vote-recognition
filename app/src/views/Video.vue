@@ -98,6 +98,7 @@
     <img
       :src="capture"
       id="image"
+      ref="image"
       style="height:100vh;width:100vw"
       v-show="false"
     />
@@ -127,7 +128,8 @@ export default {
       loadingModel: false,
       loadingSaveResult: false,
       interval: null,
-      question: ""
+      question: "",
+      modelLoaded: false
     };
   },
   methods: {
@@ -174,7 +176,11 @@ export default {
       }
     },
     predict() {
-      if (!this.start) return;
+      this.$store.commit("setSnackbar", {
+        color: "info",
+        timeout: 3000,
+        text: "Wait few seconds..."
+      });
       this.estimateMultiplePosesOnImage();
     },
     takePicture() {
@@ -188,7 +194,7 @@ export default {
     async estimateMultiplePosesOnImage() {
       var t0 = performance.now();
       this.takePicture();
-      let imageElement = document.getElementById("image");
+      let imageElement = this.$refs.image;
       if (imageElement.src != "") {
         const net = await posenet.load();
         // estimate poses
@@ -201,6 +207,14 @@ export default {
         if (!this.start) return;
         this.numberOfVotes(poses);
         this.loadingModel = false;
+        if (!this.modelLoaded) {
+          this.$store.commit("setSnackbar", {
+            color: "success",
+            timeout: 3000,
+            text: "The model is now running"
+          });
+        }
+        this.modelLoaded = true;
       }
       var t1 = performance.now();
       if (t1 - t0 > 2000) {
