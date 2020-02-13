@@ -7,9 +7,13 @@ export default new Vuex.Store({
   state: {
     snackbar: { active: false, color: "", mode: "", timeout: 0, text: "" },
     navigationDrawer: false,
-    results: []
+    results: [],
+    informationDialog: false
   },
   mutations: {
+    setInformationDialog(state, val) {
+      state.informationDialog = val;
+    },
     setSnackbar(state, val) {
       state.snackbar = Object.assign({}, val, { active: true });
     },

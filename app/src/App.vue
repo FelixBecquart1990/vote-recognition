@@ -4,18 +4,21 @@
       <router-view></router-view>
     </v-content>
     <snackbar />
+    <informationDialog />
   </v-app>
 </template>
 
 <script>
 const fb = require("./firebaseConfig.js");
 import Snackbar from "./components/Snackbar";
+import InformationDialog from "./components/InformationDialog";
 
 export default {
   name: "App",
 
   components: {
-    Snackbar
+    Snackbar,
+    InformationDialog
   },
 
   data: () => ({

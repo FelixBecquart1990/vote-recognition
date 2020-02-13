@@ -37,9 +37,21 @@
       small
       dark
       style="position:fixed;z-index:2;left:95px;top:5px"
-      @click="opentNavigationDrawer()"
+      @click="openNavigationDrawer()"
     >
       <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-poll-box</v-icon>
+    </v-btn>
+
+    <v-btn
+      fab
+      depressed
+      color="transparent"
+      small
+      dark
+      style="position:fixed;z-index:2;left:145px;top:5px"
+      @click="openInformationDialog()"
+    >
+      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-information</v-icon>
     </v-btn>
 
     <div style="position:fixed;z-index:1;top:8vh;width:100%">
@@ -85,7 +97,10 @@ export default {
     };
   },
   methods: {
-    opentNavigationDrawer() {
+    openInformationDialog() {
+      this.$store.commit("setInformationDialog", true);
+    },
+    openNavigationDrawer() {
       this.$store.commit("setNavigationDrawer", true);
     },
     save() {
