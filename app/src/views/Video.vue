@@ -1,58 +1,85 @@
 <template>
   <div class="video-recognition">
     <NavigationDrawer />
-    <v-btn
-      fab
-      depressed
-      color="transparent"
-      small
-      dark
-      style="position:fixed;z-index:2;left:5px;top:5px"
-      @click="toggle()"
-      :loading="loadingModel"
-    >
-      <v-icon
-        color="white"
-        style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
-      >{{ start ? "mdi-stop" : "mdi-play" }}</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          v-on="on"
+          fab
+          depressed
+          color="transparent"
+          small
+          dark
+          style="position:fixed;z-index:2;left:5px;top:5px"
+          @click="toggle()"
+          :loading="loadingModel"
+        >
+          <v-icon
+            color="white"
+            style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
+          >{{ start ? "mdi-stop" : "mdi-play" }}</v-icon>
+        </v-btn>
+      </template>
+      <span>Start</span>
+    </v-tooltip>
 
-    <v-btn
-      fab
-      depressed
-      color="transparent"
-      small
-      dark
-      style="position:fixed;z-index:2;left:45px;top:5px"
-      @click="save()"
-      :loading="loadingSaveResult"
-    >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-content-save</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          v-on="on"
+          fab
+          depressed
+          color="transparent"
+          small
+          dark
+          style="position:fixed;z-index:2;left:50px;top:5px"
+          @click="save()"
+          :loading="loadingSaveResult"
+        >
+          <v-icon
+            color="white"
+            style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);"
+          >mdi-content-save</v-icon>
+        </v-btn>
+      </template>
+      <span>Save</span>
+    </v-tooltip>
 
-    <v-btn
-      fab
-      depressed
-      color="transparent"
-      small
-      dark
-      style="position:fixed;z-index:2;left:95px;top:5px"
-      @click="openNavigationDrawer()"
-    >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-poll-box</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          v-on="on"
+          fab
+          depressed
+          color="transparent"
+          small
+          dark
+          style="position:fixed;z-index:2;left:100px;top:5px"
+          @click="openNavigationDrawer()"
+        >
+          <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-poll-box</v-icon>
+        </v-btn>
+      </template>
+      <span>Results</span>
+    </v-tooltip>
 
-    <v-btn
-      fab
-      depressed
-      color="transparent"
-      small
-      dark
-      style="position:fixed;z-index:2;left:145px;top:5px"
-      @click="openInformationDialog()"
-    >
-      <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-information</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          v-on="on"
+          fab
+          depressed
+          color="transparent"
+          small
+          dark
+          style="position:fixed;z-index:2;left:150px;top:5px"
+          @click="openInformationDialog()"
+        >
+          <v-icon color="white" style="text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);">mdi-information</v-icon>
+        </v-btn>
+      </template>
+      <span>Information</span>
+    </v-tooltip>
 
     <div style="position:fixed;z-index:1;top:8vh;width:100%">
       <textarea v-model="question" placeholder="Write your question here..." v-html="question"></textarea>
@@ -82,7 +109,7 @@ export default {
   },
   data() {
     return {
-      frequency: 500,
+      frequency: 1000,
       result: [0, 0],
       video: {},
       canvas: {},
@@ -171,9 +198,9 @@ export default {
         // estimate poses
         const poses = await this.net.estimateMultiplePoses(imageElement, {
           flipHorizontal: false,
-          maxDetections: 20,
+          maxDetections: 10,
           scoreThreshold: 0.6,
-          nmsRadius: 2
+          nmsRadius: 20
         });
         if (!this.start) return;
         this.analyzePoses(poses);
@@ -219,30 +246,43 @@ export default {
       return (
         pose.keypoints[7].position.y < pose.keypoints[5].position.y &&
         pose.keypoints[8].position.y < pose.keypoints[6].position.y
-        // pose.keypoints[6].position.y > pose.keypoints[8].position.y &&
-        // pose.keypoints[8].position.y > pose.keypoints[10].position.y &&
-        // pose.keypoints[7].position.y > pose.keypoints[9].position.y &&
-        // pose.keypoints[7].position.y > pose.keypoints[5].position.y &&
-        // pose.keypoints[9].position.x > pose.keypoints[5].position.x &&
-        // pose.keypoints[10].position.x > pose.keypoints[6].position.x &&
-        // pose.keypoints[8].position.x > pose.keypoints[6].position.x
       );
     },
     isTogglingNavigationDrawer(pose) {
       if (
-        pose.keypoints[9].position.x < pose.keypoints[6].position.x &&
-        pose.keypoints[10].position.x < pose.keypoints[6].position.x
+        (pose.keypoints[9].position.y && pose.keypoints[10].position.y) <
+        (pose.keypoints[6].position.y && pose.keypoints[5].position.y)
       ) {
-        // console.log("open");
-        this.$store.commit("setNavigationDrawer", true);
+        if (
+          pose.keypoints[9].position.x < pose.keypoints[6].position.x &&
+          pose.keypoints[10].position.x < pose.keypoints[6].position.x
+        ) {
+          // console.log("open");
+          this.$store.commit("setNavigationDrawer", true);
+        }
+        if (
+          pose.keypoints[9].position.x > pose.keypoints[5].position.x &&
+          pose.keypoints[10].position.x > pose.keypoints[5].position.x
+        ) {
+          // console.log("open");
+          this.$store.commit("setNavigationDrawer", false);
+        }
       }
-      if (
-        pose.keypoints[9].position.x > pose.keypoints[5].position.x &&
-        pose.keypoints[10].position.x > pose.keypoints[5].position.x
-      ) {
-        // console.log("open");
-        this.$store.commit("setNavigationDrawer", false);
-      }
+    },
+    detectMob() {
+      const toMatch = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+      ];
+
+      return toMatch.some(toMatchItem => {
+        return navigator.userAgent.match(toMatchItem);
+      });
     }
   },
   async beforeMount() {
@@ -251,7 +291,16 @@ export default {
       timeout: 3000,
       text: "Wait few seconds..."
     });
-    this.net = await posenet.load();
+    if (this.detectMob()) {
+      this.net = await posenet.load();
+    } else {
+      this.net = await posenet.load({
+        architecture: "ResNet50",
+        outputStride: 32
+        // inputResolution: { width: 257, height: 257 }
+      });
+    }
+
     this.$store.commit("setSnackbar", {
       color: "success",
       timeout: 3000,
@@ -267,6 +316,17 @@ export default {
         this.video.play();
       });
     }
+    var self = this;
+    window.addEventListener("keyup", function(event) {
+      if (event.keyCode === 13) {
+        self.toggle();
+        if (window.getSelection) {
+          window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+          document.selection.empty();
+        }
+      }
+    });
   }
 };
 </script>
@@ -284,38 +344,6 @@ export default {
   right: 6vw;
   bottom: 2vh;
 }
-/*
-.chart > * {
-  transition: height 1s;
-  vertical-align: bottom;
-  display: inline-block;
-  margin-left: 30px;
-  width: 60px;
-  border-radius: 10px;
-  text-align: center;
-  padding-top: 5px;
-  color: white;
-  font-size: 30px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
-}
-.yes {
-  background-color: #53c0a1;
-}
-
-.no {
-  background-color: #ef6d61;
-}
-
-.labels > * {
-  vertical-align: bottom;
-  display: inline-block;
-  margin-left: 30px;
-  width: 60px;
-  text-align: center;
-  color: white;
-  font-size: 30px;
-  text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
-} */
 
 div textarea {
   border: none;
