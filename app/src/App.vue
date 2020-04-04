@@ -64,8 +64,8 @@ export default {
 </script>
 
 <style>
-body::-webkit-scrollbar {
-  display: none !important;
+::-webkit-scrollbar {
+  width: 0px;
 }
 
 * {

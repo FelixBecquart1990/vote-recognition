@@ -335,7 +335,7 @@ export default {
 #video {
   width: 100vw;
   height: 100vh;
-  background-color: #2196f3;
+  background-color: #1e3f60;
   transform: scaleX(-1);
   object-fit: cover;
 }
