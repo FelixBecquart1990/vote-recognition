@@ -35,7 +35,7 @@
         </v-card-text>
 
         <v-card-title class="primary--text">
-          <v-icon color="black" left class="primary--text">mdi-handshake</v-icon>Source
+          <v-icon color="black" left class="primary--text">mdi-lightbulb-on</v-icon>Source
         </v-card-title>
         <v-card-text class="pb-5">
           This application uses
@@ -90,6 +90,22 @@
           >Firebase</a>
           ~ hosting and database
         </v-card-text>
+
+        <v-card-title class="primary--text">
+          <v-icon color="black" left class="primary--text">mdi-handshake</v-icon>Support
+        </v-card-title>
+        <v-card-text
+          class="pb-5"
+        >Did you enjoy this application? Please consider adding a star on the Github repository:</v-card-text>
+        <iframe
+          src="https://ghbtns.com/github-btn.html?user=FelixBecquart1990&repo=vote-recognition&type=star&count=true&size=large"
+          frameborder="0"
+          scrolling="0"
+          width="160px"
+          height="30px"
+          class="mx-5 mb-5"
+        ></iframe>
+
         <v-card-title class="primary--text">
           <v-icon color="black" left class="primary--text">mdi-account</v-icon>Author
         </v-card-title>
